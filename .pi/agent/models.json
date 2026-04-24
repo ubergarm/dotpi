@@ -13,7 +13,9 @@
           "maxTokens": 65536,
           "cost": {
             "input": 5,
-            "output": 25
+            "output": 25,
+            "cacheRead": 0.5,
+            "cacheWrite": 6.25
           }
         }
       ]
