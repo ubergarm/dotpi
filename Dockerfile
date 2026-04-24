@@ -10,13 +10,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fd-find \
     git \
     curl \
+    jq \
     build-essential \
     cmake \
     ca-certificates \
     fonts-dejavu-extra \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar xz --strip-components=1 -C /usr/local
+# Fetch latest LTS Node.js version dynamically at build time from index.json
+RUN NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | jq -r '[.[] | select(.lts != null)] | sort_by(.date) | reverse | .[0].version | ltrimstr("v")') && \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz" | tar xz --strip-components=1 -C /usr/local
 
 RUN groupadd -g "$BUILD_GID" appgroup && \
     useradd -u "$BUILD_UID" -g "$BUILD_GID" -m -d /home/app appuser
