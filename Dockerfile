@@ -22,9 +22,9 @@ RUN NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | jq -r '[.[] | se
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz" | tar xz --strip-components=1 -C /usr/local
 
 RUN groupadd -g "$BUILD_GID" appgroup && \
-    useradd -u "$BUILD_UID" -g "$BUILD_GID" -m -d /home/app appuser
+    useradd -u "$BUILD_UID" -g "$BUILD_GID" -m -d /home/job job
 
-ENV HOME=/home/app
+ENV HOME=/home/job
 
 # XDG Base Directory overrides - all data stays in /app/.opencode/ bind mount
 #ENV XDG_DATA_HOME=/app/.opencode/data
@@ -36,6 +36,6 @@ ENV HOME=/home/app
 ENV PI_CODING_AGENT_DIR=/app/pi/.pi/agent
 
 WORKDIR /app/
-USER appuser
+USER job
 
 ENTRYPOINT ["/usr/bin/bash"]
