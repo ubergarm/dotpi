@@ -40,5 +40,4 @@ Full docs at `/app/pi-mono/packages/coding-agent/docs/*.md` — covers extension
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| **web-search** | `/skill:web-search` | Search the web via DuckDuckGo (text, news, images, videos, books) and extract page content |
-| **web-fetch** | `/skill:web-fetch` | Fetch a URL and extract readable content as markdown or plain text |
+| **web-search** | `/skill:web-search` | Search the web via DuckDuckGo (text, news, images, videos, books), or extract content from a specific URL |

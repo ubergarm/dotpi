@@ -1,10 +1,11 @@
 ---
 name: web-search
 description: >
-  Web search and content extraction using DuckDuckGo (ddgs). Search the web for
-  text, news, images, videos, and books. Extract readable content from any URL
-  into markdown or plain text. Use when you need to look up information online,
-  find documentation, search for recent news, or fetch page content from a URL.
+  Web search and content extraction using DuckDuckGo (ddgs). Two main uses:
+  (1) Search the web for text, news, images, videos, and books.
+  (2) Extract readable content from a specific URL into markdown or plain text.
+  Use this skill whenever you need to look up information online, find documentation,
+  or fetch the content of a specific web page.
 ---
 
 # Web Search
@@ -13,10 +14,12 @@ Web search and content extraction powered by [ddgs](https://github.com/mesonix/d
 
 ## Setup
 
-Run once before first use:
+Run once before first use (from `/app/pi`):
 
 ```bash
-source /app/venv/bin/activate
+cd .pi/skills/web-search
+uv venv .venv --relocatable -p 3.13 --python-preference=only-managed
+uv sync
 ```
 
 ## Web Search
@@ -26,29 +29,29 @@ Search the web for information. Supports text, news, images, videos, and books.
 ### Basic search
 
 ```bash
-python web_search.py --query "your search query here"
+uv run python web_search.py --query "your search query here"
 ```
 
 ### Search with options
 
 ```bash
 # News search limited to last week
-python web_search.py --query "AI breakthroughs" --type news --timelimit w
+uv run python web_search.py --query "AI breakthroughs" --type news --timelimit w
 
 # Image search, 5 results
-python web_search.py --query "mountain landscapes" --type images --limit 5
+uv run python web_search.py --query "mountain landscapes" --type images --limit 5
 
 # Video search
-python web_search.py --query "python tutorial" --type videos
+uv run python web_search.py --query "python tutorial" --type videos
 
 # Output as markdown instead of JSON
-python web_search.py --query "rust programming" --format markdown
+uv run python web_search.py --query "rust programming" --format markdown
 ```
 
 ### Search and extract top result
 
 ```bash
-python web_search.py --query "Python documentation" --extract-top
+uv run python web_search.py --query "Python documentation" --extract-top
 ```
 
 ### Search types
@@ -66,8 +69,8 @@ python web_search.py --query "Python documentation" --extract-top
 Fetch and extract readable content from a URL:
 
 ```bash
-python web_search.py --extract https://example.com
-python web_search.py --extract https://en.wikipedia.org/wiki/Python --format markdown
+uv run python web_search.py --extract https://example.com
+uv run python web_search.py --extract https://en.wikipedia.org/wiki/Python --format markdown
 ```
 
 ## Options Reference
