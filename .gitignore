@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Pi runtime data
+.pi/sessions/
+.pi/auth.json
+.pi/settings.json
+.pi/bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
