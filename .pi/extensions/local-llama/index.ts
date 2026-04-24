@@ -1,11 +1,13 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
-const BASE_URL = "http://localhost:8080/v1";
+const ENDPOINTS = [
+  { name: "local-llama-8080", baseUrl: "http://localhost:8080/v1" },
+  { name: "local-llama-8088", baseUrl: "http://localhost:8088/v1" },
+];
 
-export default async function (pi: ExtensionAPI) {
-  let models;
+async function fetchModels(baseUrl: string): Promise<NonNullable<Parameters<ExtensionAPI["registerProvider"]>[1]["models"]>> {
   try {
-    const response = await fetch(`${BASE_URL}/models`);
+    const response = await fetch(`${baseUrl}/models`);
     if (!response.ok) {
       throw new Error(`Failed to fetch models: ${response.status}`);
     }
@@ -17,24 +19,37 @@ export default async function (pi: ExtensionAPI) {
         max_tokens?: number;
       }>;
     };
-    models = payload.data.map((model) => ({
+    return payload.data.map((model) => ({
       id: model.id,
       name: model.name ?? model.id,
       reasoning: false,
-      input: ["text"],
+      input: ["text"] as const,
       cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
       contextWindow: model.context_window ?? 128000,
       maxTokens: model.max_tokens ?? 4096,
     }));
   } catch {
-    models = [];
+    return [];
   }
+}
 
-  pi.registerProvider("local-llama", {
-    baseUrl: BASE_URL,
-    apiKey: "NOT_NEEDED",
-    authHeader: false,
-    api: "openai-completions",
-    models,
-  });
+export default async function (pi: ExtensionAPI) {
+  // Fetch models from both endpoints in parallel
+  const results = await Promise.all(
+    ENDPOINTS.map(async ({ name, baseUrl }) => ({
+      name,
+      baseUrl,
+      models: await fetchModels(baseUrl),
+    }))
+  );
+
+  for (const { name, baseUrl, models } of results) {
+    pi.registerProvider(name, {
+      baseUrl,
+      apiKey: "NOT_NEEDED",
+      authHeader: false,
+      api: "openai-completions",
+      models,
+    });
+  }
 }
