@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     jq \
+    sudo \
     build-essential \
     cmake \
     ca-certificates \
@@ -22,7 +23,8 @@ RUN NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | jq -r '[.[] | se
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz" | tar xz --strip-components=1 -C /usr/local
 
 RUN groupadd -g "$BUILD_GID" appgroup && \
-    useradd -u "$BUILD_UID" -g "$BUILD_GID" -m -d /home/job job
+    useradd -u "$BUILD_UID" -g "$BUILD_GID" -m -d /home/job job && \
+    echo 'job ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/job
 
 ENV HOME=/home/job
 
