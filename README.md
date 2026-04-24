@@ -117,6 +117,18 @@ Pi provides four default tools that the model uses to interact with your project
 | `edit` | Precise file text replacement |
 | `write` | Create or overwrite files |
 
+## Documentation Strategy (Progressive Disclosure)
+
+This project uses progressive disclosure across its documentation files to keep context windows lean:
+
+1. **`AGENTS.md`** — Minimal dispatch file. Just enough for an agent to orient itself: run command, config path, skill/extension index.
+2. **`README.md`** — Full setup, configuration, and usage guide. Read when you need implementation details.
+3. **`SKILL.md`** (per skill) — Read only when the agent needs to use that specific skill. Contains usage instructions, CLI commands, and examples.
+4. **Extension source** (`index.ts`, `token-footer.ts`) — Read when debugging or modifying extension behavior.
+5. **Upstream docs** (`/app/pi-mono/packages/coding-agent/docs/`) — Read for deep dives into APIs, themes, keybindings, etc.
+
+The goal: no repetition, no bloat. An agent reads only what it needs for the task at hand.
+
 ## Documentation
 
 Full upstream docs: `/app/pi-mono/packages/coding-agent/docs/`
