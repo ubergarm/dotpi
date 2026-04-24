@@ -33,7 +33,10 @@ async function fetchModels(
   defaultPricing: typeof DEFAULT_PRICING,
 ): Promise<NonNullable<Parameters<ExtensionAPI["registerProvider"]>[1]["models"]>> {
   try {
-    const response = await fetch(`${baseUrl}/models`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2_000);
+    const response = await fetch(`${baseUrl}/models`, { signal: controller.signal });
+    clearTimeout(timeout);
     if (!response.ok) {
       throw new Error(`Failed to fetch models: ${response.status}`);
     }
@@ -54,7 +57,12 @@ async function fetchModels(
       contextWindow: model.context_window ?? 160000,
       maxTokens: model.max_tokens ?? 4096,
     }));
-  } catch {
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      console.warn(`[local-llama] Timeout after 2s fetching models from ${baseUrl}`);
+    } else if (err instanceof Error) {
+      console.warn(`[local-llama] Endpoint down at ${baseUrl}: ${err.message}`);
+    }
     return [];
   }
 }
