@@ -1,0 +1,8 @@
+{
+  "default": {
+    "input": 15,
+    "output": 75,
+    "cacheRead": 1.25,
+    "cacheWrite": 18.75
+  }
+}
