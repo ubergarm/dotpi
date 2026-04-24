@@ -25,7 +25,7 @@ async function fetchModels(baseUrl: string): Promise<NonNullable<Parameters<Exte
       reasoning: false,
       input: ["text"] as const,
       cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-      contextWindow: model.context_window ?? 128000,
+      contextWindow: model.context_window ?? 160000,
       maxTokens: model.max_tokens ?? 4096,
     }));
   } catch {
