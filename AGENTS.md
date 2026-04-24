@@ -19,14 +19,14 @@ It calls the OpenAI-compatible `/models` endpoint on each server, discovers what
 
 ### Pricing
 
-Default API request pricing is stored in `.pi/agent/default-pricing.json`. This file is read by the extension at startup and applied to every dynamically discovered model. Currently set to Claude Opus 4.6 rates (per 1M tokens):
+Default API request pricing is stored in `.pi/agent/default-pricing.json`. This file is read by the extension at startup and applied to every dynamically discovered model. Currently set to (per 1M tokens):
 
 | Field | Value |
 |-------|-------|
-| `input` | 15.00 |
-| `output` | 75.00 |
-| `cacheRead` | 1.25 |
-| `cacheWrite` | 18.75 |
+| `input` | 3 |
+| `output` | 15 |
+| `cacheRead` | 0.25 |
+| `cacheWrite` | 3.75 |
 
 To change pricing, edit `default-pricing.json` and run `/reload` in pi.
 
