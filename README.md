@@ -3,7 +3,7 @@ pi coding agent
 
 ## Install
 
-Keep everything clean in one folder with no outside dependencies except npm.
+Keep everything clean in one folder with no outside dependencies except npm stuff installed in local ./node_modules/ folder.
 
 ```bash
 # install
@@ -17,11 +17,7 @@ node /app/pi/node_modules/@mariozechner/pi-coding-agent/dist/cli.js --config-dir
 ```
 
 ## Configure
-Example config file
-
-```json
-TODO
-```
+All configuration lives in .pi/ subfolder. Setup for llama.cpp endpoints lives in the local-llama extension.
 
 ## References
 https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent
