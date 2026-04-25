@@ -74,16 +74,30 @@ interface ServerProps {
 }
 
 async function fetchProps(baseUrl: string): Promise<ServerProps> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2_000);
-    const response = await fetch(`${baseUrl}/props`, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!response.ok) return {};
-    return (await response.json()) as ServerProps;
-  } catch {
-    return {};
+  // Try the OpenAI-compat path first, then fall back to the full /props root
+  const urls = [
+    `${baseUrl}/props`,                         // /v1/props (OpenAI-compat, may be trimmed)
+    baseUrl.replace(/\/v1\/?$/, "") + "/props", // /props (full endpoint with all fields)
+  ];
+
+  for (const url of urls) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2_000);
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (!response.ok) continue;
+      const data = (await response.json()) as ServerProps;
+      // If this response has the fields we need, return it
+      if (data.default_generation_settings || data.model_info) {
+        return data;
+      }
+      // Otherwise keep trying — later endpoints may have richer data
+    } catch {
+      // continue to next URL
+    }
   }
+  return {};
 }
 
 function supportsVision(props: ServerProps): boolean {
