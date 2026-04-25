@@ -108,12 +108,7 @@ export default function (pi: ExtensionAPI) {
 
           // --- Right side: model name ---
           const modelName = ctx.model?.id || "no-model";
-
           let rightSideWithoutProvider = modelName;
-          if (ctx.model?.reasoning) {
-            const thinkingLevel = pi.getThinkingLevel();
-            rightSideWithoutProvider = `${modelName} • ${thinkingLevel}`;
-          }
 
           // Prepend provider in parentheses if multiple providers available
           let rightSide = rightSideWithoutProvider;

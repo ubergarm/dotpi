@@ -256,11 +256,15 @@ export default async function (pi: ExtensionAPI) {
   );
 
   // Track which endpoints are alive for status display
-  const aliveEndpoints = new Map<string, { serverDefaults: Record<string, number> | null; reasoning: boolean }>();
+  const aliveEndpoints = new Map<string, { serverDefaults: Record<string, number> | null; reasoning: boolean; vision: boolean }>();
 
-  for (const { name, baseUrl, models, serverDefaults, reasoningSupported } of results) {
+  for (const { name, baseUrl, models, serverDefaults, reasoningSupported, props } of results) {
     if (models.length > 0) {
-      aliveEndpoints.set(baseUrl, { serverDefaults, reasoning: reasoningSupported });
+      aliveEndpoints.set(baseUrl, {
+        serverDefaults,
+        reasoning: reasoningSupported,
+        vision: supportsVision(props),
+      });
     }
 
     pi.registerProvider(name, {
@@ -302,7 +306,9 @@ export default async function (pi: ExtensionAPI) {
     for (const [baseUrl, info] of aliveEndpoints) {
       const port = baseUrl.split(":")[2]?.split("/")[0] ?? "?";
       const reasoningLabel = info.reasoning ? "🧠" : "💤";
-      parts.push(`local:${port} ${reasoningLabel}`);
+      const visionLabel = info.vision ? "🖼️" : "";
+      const labels = `${reasoningLabel}${visionLabel ? ` ${visionLabel}` : ""}`;
+      parts.push(`local:${port} ${labels}.`);
     }
     ctx.ui.setStatus("local-llama", parts.join(" "));
   }
