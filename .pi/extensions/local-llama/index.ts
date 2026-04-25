@@ -28,9 +28,32 @@ const ENDPOINTS = [
   { name: "local-llama-8088", baseUrl: "http://localhost:8088/v1" },
 ];
 
+async function fetchVisionSupport(
+  baseUrl: string,
+): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2_000);
+    const response = await fetch(`${baseUrl}/props`, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!response.ok) {
+      return false;
+    }
+    const payload = (await response.json()) as {
+      modalities?: {
+        vision?: boolean;
+      };
+    };
+    return !!payload.modalities?.vision;
+  } catch {
+    return false;
+  }
+}
+
 async function fetchModels(
   baseUrl: string,
   defaultPricing: typeof DEFAULT_PRICING,
+  supportsVision: boolean,
 ): Promise<NonNullable<Parameters<ExtensionAPI["registerProvider"]>[1]["models"]>> {
   try {
     const controller = new AbortController();
@@ -52,7 +75,7 @@ async function fetchModels(
       id: model.id,
       name: model.name ?? model.id,
       reasoning: false,
-      input: ["text"] as const,
+      input: supportsVision ? (["text", "image"] as const) : (["text"] as const),
       cost: defaultPricing,
       contextWindow: model.context_window ?? 160000,
       maxTokens: model.max_tokens ?? 4096,
@@ -70,12 +93,12 @@ async function fetchModels(
 export default async function (pi: ExtensionAPI) {
   const defaultPricing = loadDefaultPricing();
 
-  // Fetch models from both endpoints in parallel
+  // Fetch models and vision support from all endpoints in parallel
   const results = await Promise.all(
     ENDPOINTS.map(async ({ name, baseUrl }) => ({
       name,
       baseUrl,
-      models: await fetchModels(baseUrl, defaultPricing),
+      models: await fetchModels(baseUrl, defaultPricing, await fetchVisionSupport(baseUrl)),
     }))
   );
 
