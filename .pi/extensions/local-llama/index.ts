@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// ── Pricing ──────────────────────────────────────────────────────────────────
+// ── Defaults ─────────────────────────────────────────────────────────────────
 
 const DEFAULT_PRICING = {
   input: 0,
@@ -13,19 +13,6 @@ const DEFAULT_PRICING = {
   cacheRead: 0,
   cacheWrite: 0,
 };
-
-function loadDefaultPricing(): typeof DEFAULT_PRICING {
-  try {
-    const pricingPath = join(__dirname, "default-pricing.json");
-    const raw = readFileSync(pricingPath, "utf-8");
-    const parsed = JSON.parse(raw) as { default: typeof DEFAULT_PRICING };
-    return parsed.default ?? DEFAULT_PRICING;
-  } catch {
-    return DEFAULT_PRICING;
-  }
-}
-
-// ── Generation settings ──────────────────────────────────────────────────────
 
 interface GenerationSettings {
   reasoningBudget: number;
@@ -45,14 +32,25 @@ const DEFAULT_GENERATION_SETTINGS: GenerationSettings = {
   presencePenalty: 0.0,
 };
 
-function loadGenerationSettings(): GenerationSettings {
+interface DefaultsConfig {
+  pricing?: typeof DEFAULT_PRICING;
+  serverFlags?: Partial<GenerationSettings>;
+}
+
+function loadDefaults(): { pricing: typeof DEFAULT_PRICING; generationSettings: GenerationSettings } {
   try {
-    const configPath = join(__dirname, "default-settings.json");
-    const raw = readFileSync(configPath, "utf-8");
-    const parsed = JSON.parse(raw) as { serverFlags?: Partial<GenerationSettings> };
-    return { ...DEFAULT_GENERATION_SETTINGS, ...parsed.serverFlags };
+    const defaultsPath = join(__dirname, "defaults.json");
+    const raw = readFileSync(defaultsPath, "utf-8");
+    const parsed = JSON.parse(raw) as DefaultsConfig;
+    return {
+      pricing: parsed.pricing ?? DEFAULT_PRICING,
+      generationSettings: { ...DEFAULT_GENERATION_SETTINGS, ...parsed.serverFlags },
+    };
   } catch {
-    return DEFAULT_GENERATION_SETTINGS;
+    return {
+      pricing: DEFAULT_PRICING,
+      generationSettings: DEFAULT_GENERATION_SETTINGS,
+    };
   }
 }
 
@@ -237,8 +235,7 @@ function buildBodyOverrides(settings: GenerationSettings): Record<string, number
 // ── Extension factory ────────────────────────────────────────────────────────
 
 export default async function (pi: ExtensionAPI) {
-  const defaultPricing = loadDefaultPricing();
-  const generationSettings = loadGenerationSettings();
+  const { pricing: defaultPricing, generationSettings } = loadDefaults();
 
   // Fetch props and models from all endpoints in parallel
   const results = await Promise.all(
@@ -346,13 +343,13 @@ export default async function (pi: ExtensionAPI) {
         lines.push("");
       }
 
-      lines.push("Current request overrides (from default-settings.json):");
+      lines.push("Current request overrides (from defaults.json):");
       const overrides = buildBodyOverrides(generationSettings);
       for (const [key, value] of Object.entries(overrides)) {
         lines.push(`  ${key}: ${value}`);
       }
       lines.push("");
-      lines.push("Edit .pi/extensions/local-llama/default-settings.json to change values.");
+      lines.push("Edit .pi/extensions/local-llama/defaults.json to change values.");
       lines.push("Press Esc to close.");
 
       ctx.ui.setWidget("llama-params", lines);
