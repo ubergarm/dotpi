@@ -25,9 +25,9 @@ export default function (pi: ExtensionAPI) {
 
   function updateStatus(ctx: { ui: { setStatus: (id: string, text?: string) => void; theme: { fg: (color: string, text: string) => string } } }) {
     if (thinkingEnabled) {
-      ctx.ui.setStatus("thinking", ctx.ui.theme.fg("accent", "🧠 thinking"));
+      ctx.ui.setStatus("thinking", ctx.ui.theme.fg("accent", "thinking ✅"));
     } else {
-      ctx.ui.setStatus("thinking", ctx.ui.theme.fg("dim", "🧠 no-thinking"));
+      ctx.ui.setStatus("thinking", ctx.ui.theme.fg("dim", "no-think 🚫"));
     }
   }
 
