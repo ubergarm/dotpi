@@ -15,11 +15,17 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 |-------|------|-------|
 | web-search | `.pi/skills/web-search/` | Read `SKILL.md` for usage details |
 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `llama-params` | Show local-llama server defaults and current generation overrides |
+
 ## Extensions
 
 | Extension | Path | Notes |
 |-----------|------|-------|
-| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery from llama.cpp endpoints |
+| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery; auto-detects vision & reasoning support via `/props`; injects generation params into requests; status bar shows endpoint health with 🧠/💤 reasoning indicator |
 | token-footer | `.pi/extensions/token-footer.ts` | Token count footer (k/M format) |
 
 ## Key Files
@@ -27,5 +33,6 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | File | Purpose |
 |------|---------|
 | `.pi/settings.json` | Default provider, model, theme, thinking level |
-| `.pi/agent/default-pricing.json` | Token pricing (edit + `/reload` in pi) |
+| `.pi/extensions/local-llama/default-pricing.json` | Token pricing for local models |
+| `.pi/extensions/local-llama/default-settings.json` | Generation settings (temperature, topP, reasoning budget, etc.) |
 | `pi.sh` | Launcher (sets `PI_CODING_AGENT_DIR`) |
