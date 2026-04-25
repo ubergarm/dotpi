@@ -18,7 +18,7 @@ Run once before first use (from `/app/pi`):
 
 ```bash
 cd .pi/skills/web-search
-uv venv .venv --relocatable -p 3.13 --python-preference=only-managed
+uv venv .venv --relocatable --python 3.13 --python-preference=only-managed
 uv sync
 ```
 

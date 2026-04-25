@@ -10,8 +10,8 @@ docker run --rm -it \
     --network=host \
     -v "$(pwd):/app/:rw" \
     -v "$LOCAL_UV:/usr/bin/uv:ro" \
-    -v "$LOCAL_UV_PYTHON:/home/app/.local/share/uv/python/:ro" \
-    -v "$LOCAL_UV_CACHE:/home/app/.cache/uv/" \
+    -v "$LOCAL_UV_PYTHON:/home/job/.local/share/uv/python/:ro" \
+    -v "$LOCAL_UV_CACHE:/home/job/.cache/uv/" \
     -v "$LOCAL_UV_PYTHON:/home/garm/.local/share/uv/python/:ro" \
     -e "TERM" \
     -e "COLORTERM" \
