@@ -84,7 +84,7 @@ Four extensions are configured:
 | local-llama | `.pi/extensions/local-llama/` | Dynamically registers GGUF models from llama.cpp endpoints |
 | thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode for local-llama models (`/thinking`, `Ctrl+Shift+T`) |
 | token-footer | `.pi/extensions/token-footer.ts` | Shows actual token counts (`2.9k/160k`) instead of percentage in the footer |
-| undo | `.pi/extensions/undo.ts` | Roll back to the most recent user message (`/undo`) |
+| undo | `.pi/extensions/undo.ts` | Roll back to the most recent user message without summarization (`/undo`) |
 
 ## Skills
 
@@ -134,7 +134,7 @@ The goal: no repetition, no bloat. An agent reads only what it needs for the tas
 
 ## Documentation
 
-Full upstream docs: `/app/pi-mono/packages/coding-agent/docs/`
+Full markdown docs: `/app/pi/node_modules/@mariozechner/pi-coding-agent/docs/`
 
 Key topics:
 - `extensions.md` — Building custom extensions
@@ -144,6 +144,12 @@ Key topics:
 - `settings.md` — All configuration options
 - `providers.md` — Provider setup
 - `models.md` — Model configuration
+
+## TODO
+
+- [ ] Add the scout subagent which already has code available for reading and summarizing big files.
+- [ ] Add some LSPs or Linting for node and python and cpp code using Automatic Post-Edit Linting via tool_result Hook in `.pi/extensions/linting.ts`
+- [ ] ssh extension already exists for running commands on remote server...
 
 ## References
 

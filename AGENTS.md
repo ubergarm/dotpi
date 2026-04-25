@@ -14,7 +14,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 
 | Skill | Path | Notes |
 |-------|------|-------|
-| web-search | `.pi/skills/web-search/` | DuckDuckGo search & page extraction via `ddgs`. Read `SKILL.md` for usage details. Uses `uv` + Python 3.14 |
+| web-search | `.pi/skills/web-search/` | DuckDuckGo search & page extraction via `ddgs`. Read `SKILL.md` for usage details. Uses `uv` + Python 3.13 |
 
 ## Commands
 
@@ -60,7 +60,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 
 ## Documentation
 
-Full upstream docs: `/app/pi-mono/packages/coding-agent/docs/`
+Full upstream docs: `/app/pi/node_modules/@mariozechner/pi-coding-agent/docs/`
 
 Key topics:
 - `extensions.md` — Building custom extensions
