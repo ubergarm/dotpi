@@ -78,10 +78,14 @@ Pi will auto-discover loaded models on startup.
 
 ## Extensions
 
-Two extensions are configured:
+Four extensions are configured:
 
-1. **local-llama** (`.pi/extensions/local-llama/`) — Dynamically registers GGUF models from llama.cpp endpoints
-2. **token-footer** (`.pi/extensions/token-footer.ts`) — Shows actual token counts (`2.9k/160k`) instead of percentage in the footer
+| Extension | File | Description |
+|-----------|------|-------------|
+| local-llama | `.pi/extensions/local-llama/` | Dynamically registers GGUF models from llama.cpp endpoints |
+| thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode for local-llama models (`/thinking`, `Ctrl+Shift+T`) |
+| token-footer | `.pi/extensions/token-footer.ts` | Shows actual token counts (`2.9k/160k`) instead of percentage in the footer |
+| undo | `.pi/extensions/undo.ts` | Roll back to the most recent user message (`/undo`) |
 
 ## Skills
 
