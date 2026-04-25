@@ -55,7 +55,6 @@ All pi configuration lives in the `.pi/` directory:
 {
   "defaultProvider": "local-llama-8080",
   "defaultModel": "Qwen3.6-27B",
-  "defaultThinkingLevel": "medium",
   "theme": "dark",
   "enableInstallTelemetry": false
 }
