@@ -16,5 +16,7 @@ docker run --rm -it \
     -e "TERM" \
     -e "COLORTERM" \
     -e "PI_CODING_AGENT_DIR=/app/pi/.pi/agent" \
+    -e "XDG_RUNTIME_DIR=/run/user/$(id -u)" \
+    -v "/run/user/$(id -u)/pipewire-0:/run/user/$(id -u)/pipewire-0" \
     --entrypoint /bin/bash \
     pi:latest "$@"

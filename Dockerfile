@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     ca-certificates \
     fonts-dejavu-extra \
+    pipewire-bin \
     && rm -rf /var/lib/apt/lists/*
 
 # Fetch latest LTS Node.js version dynamically at build time from index.json
