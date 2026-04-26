@@ -282,15 +282,11 @@ export default async function (pi: ExtensionAPI) {
     if (!isLocalLlama(ctx)) return;
 
     const payload = event.payload as Record<string, unknown>;
-    const body = (payload.body as Record<string, unknown> | undefined) ?? {};
     const overrides = buildBodyOverrides(generationSettings);
 
     return {
       ...payload,
-      body: {
-        ...body,
-        ...overrides,
-      },
+      ...overrides,
     };
   });
 
