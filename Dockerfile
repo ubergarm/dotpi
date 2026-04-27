@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     socat \
     netcat-openbsd \
     openssh-client \
+    rsync \
     procps \
     psmisc \
     strace \
