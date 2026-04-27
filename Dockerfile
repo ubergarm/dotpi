@@ -17,6 +17,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     fonts-dejavu-extra \
     pipewire-bin \
+    xxd \
+    bsdextrautils \
+    file \
+    binutils \
+    bind9-dnsutils \
+    iproute2 \
+    iputils-ping \
+    wget \
+    socat \
+    netcat-openbsd \
+    openssh-client \
+    procps \
+    psmisc \
+    strace \
+    ltrace \
+    tcpdump \
+    unzip \
+    zip \
+    bzip2 \
+    sqlite3 \
+    bc \
+    tldr \
+    man-db \
     && rm -rf /var/lib/apt/lists/*
 
 # Fetch latest LTS Node.js version dynamically at build time from index.json

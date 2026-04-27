@@ -60,6 +60,10 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 ./docker-run.sh          # Run (mounts workspace + uv)
 ```
 
+### Agent Environment
+
+The container runs as user `job` with passwordless `sudo`. You can run `sudo apt-get update` to search for or install additional packages. A broad set of CLI utilities is pre-installed (networking, binary inspection, process tracing, archives, etc.). If you need to learn how a pre-installed tool works, use `tldr <command>` for a quick summary, `man <command>` for full documentation, or `dpkg -l | grep <pattern>` to discover available packages.
+
 ## Documentation
 
 Full upstream docs: `/app/pi/node_modules/@mariozechner/pi-coding-agent/docs/`
