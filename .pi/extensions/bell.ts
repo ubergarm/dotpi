@@ -10,7 +10,17 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 const BELL_WAV = "/app/pi/assets/bell.wav";
 
 export default function (pi: ExtensionAPI) {
-  pi.on("agent_end", async (_event, _ctx) => {
+  pi.on("agent_end", async (event, _ctx) => {
+    const lastAssistant = [...event.messages]
+      .reverse()
+      .find((m) => "role" in m && m.role === "assistant") as
+      | { stopReason: "stop" | "length" | "toolUse" | "error" | "aborted" }
+      | undefined;
+
+    if (lastAssistant?.stopReason === "aborted") {
+      return;
+    }
+
     try {
       await pi.exec("pw-play", ["--volume", "1.0", BELL_WAV], { timeout: 1000 });
     } catch {
