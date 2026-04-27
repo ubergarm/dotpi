@@ -12,7 +12,7 @@ const BELL_WAV = "/app/pi/assets/bell.wav";
 export default function (pi: ExtensionAPI) {
   pi.on("agent_end", async (_event, _ctx) => {
     try {
-      await pi.exec("pw-play", [BELL_WAV], { timeout: 5000 });
+      await pi.exec("pw-play", ["--volume", "1.0", BELL_WAV], { timeout: 1000 });
     } catch {
       // Silently ignore audio errors so pi never breaks when
       // PipeWire is unavailable or the socket isn't mounted.
