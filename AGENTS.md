@@ -7,7 +7,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 - **Run:** `./pi.sh`
 - **Config:** `.pi/settings.json` (default: `ubergarm/Kimi-K2.6-GGUF` on `localhost:8088`)
 - **Models:** Discovered dynamically by `local-llama` extension from llama.cpp servers
-- **Package:** `@mariozechner/pi-coding-agent` (^0.70.2) in `node_modules/`
+- **Package:** `@mariozechner/pi-coding-agent` (^0.70.5) in `node_modules/`
 - **Docs:** `node_modules/@mariozechner/pi-coding-agent/docs/`
 
 ## Skills
