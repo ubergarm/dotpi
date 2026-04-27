@@ -13,7 +13,7 @@ npm install
 ./pi.sh
 ```
 
-Models are discovered automatically from any running llama.cpp instance. The default config targets `Qwen3.6-27B` on `localhost:8080`.
+Models are discovered automatically from any running llama.cpp instance. The default config targets `ubergarm/Kimi-K2.6-GGUF` on `localhost:8088`.
 
 ## Installation
 
@@ -45,18 +45,20 @@ All pi configuration lives in the `.pi/` directory:
 | File | Purpose |
 |------|---------|
 | `.pi/settings.json` | Default provider, model, theme, thinking level |
-| `.pi/agent/default-pricing.json` | Token pricing for cost tracking |
+| `.pi/extensions/local-llama/defaults.json` | Token pricing and generation settings (temperature, topP, reasoning budget, etc.) |
 | `.pi/extensions/` | Custom TypeScript extensions |
 | `.pi/skills/` | On-demand capability packages |
+| `.pi/extensions/bell.ts` | Bell extension source (plays sound on `agent_end`) |
 
 ### Default Settings
 
 ```json
 {
-  "defaultProvider": "local-llama-8080",
-  "defaultModel": "Qwen3.6-27B",
-  "theme": "dark",
-  "enableInstallTelemetry": false
+  "lastChangelogVersion": "0.70.2",
+  "defaultProvider": "local-llama-8088",
+  "defaultModel": "ubergarm/Kimi-K2.6-GGUF",
+  "enableInstallTelemetry": false,
+  "theme": "dark"
 }
 ```
 
@@ -75,16 +77,26 @@ llama-server -m /path/to/model.gguf --host 0.0.0.0 --port 8080
 
 Pi will auto-discover loaded models on startup.
 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `llama-params` | Show local-llama server defaults and current generation overrides |
+| `thinking` | Toggle thinking mode on/off for local-llama models (`/thinking on`/`off`) |
+| `token-footer` | Toggle custom token footer (actual token counts vs percentage) |
+| `undo` | Roll back to the most recent user message, placing its text in the editor for re-submission |
+
 ## Extensions
 
-Four extensions are configured:
+Extensions:
 
 | Extension | File | Description |
 |-----------|------|-------------|
-| local-llama | `.pi/extensions/local-llama/` | Dynamically registers GGUF models from llama.cpp endpoints |
-| thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode for local-llama models (`/thinking`, `Ctrl+Shift+T`) |
-| token-footer | `.pi/extensions/token-footer.ts` | Shows actual token counts (`2.9k/160k`) instead of percentage in the footer |
-| undo | `.pi/extensions/undo.ts` | Roll back to the most recent user message without summarization (`/undo`) |
+| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` and `localhost:8088`; auto-detects vision & reasoning support via `/props`; injects generation params; status bar shows endpoint health with 🧠/💤 reasoning indicator |
+| thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode (`chat_template_kwargs.enable_thinking`) via `/thinking` command or `Ctrl+Shift+T` shortcut; persists state per session |
+| token-footer | `.pi/extensions/token-footer.ts` | Custom footer showing actual token counts (e.g. `2.9k/160k`) instead of percentage; toggle with `/token-footer` |
+| undo | `.pi/extensions/undo.ts` | `/undo` command — auto-picks the most recent user message on the current branch and rolls back without summarization |
+| bell | `.pi/extensions/bell.ts` | Plays a bell sound via PipeWire when the agent finishes its turn |
 
 ## Skills
 
@@ -128,7 +140,7 @@ This project uses progressive disclosure across its documentation files to keep 
 2. **`README.md`** — Full setup, configuration, and usage guide. Read when you need implementation details.
 3. **`SKILL.md`** (per skill) — Read only when the agent needs to use that specific skill. Contains usage instructions, CLI commands, and examples.
 4. **Extension source** (`index.ts`, `token-footer.ts`) — Read when debugging or modifying extension behavior.
-5. **Upstream docs** (`/app/pi-mono/packages/coding-agent/docs/`) — Read for deep dives into APIs, themes, keybindings, etc.
+5. **Upstream docs** (`/app/pi/node_modules/@mariozechner/pi-coding-agent/docs/`) — Read for deep dives into APIs, themes, keybindings, etc.
 
 The goal: no repetition, no bloat. An agent reads only what it needs for the task at hand.
 

@@ -5,7 +5,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 ## Quick Reference
 
 - **Run:** `./pi.sh`
-- **Config:** `.pi/settings.json` (default: `Qwen3.6-27B` on `localhost:8080`)
+- **Config:** `.pi/settings.json` (default: `ubergarm/Kimi-K2.6-GGUF` on `localhost:8088`)
 - **Models:** Discovered dynamically by `local-llama` extension from llama.cpp servers
 - **Package:** `@mariozechner/pi-coding-agent` (^0.70.2) in `node_modules/`
 - **Docs:** `node_modules/@mariozechner/pi-coding-agent/docs/`
@@ -33,6 +33,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode (`chat_template_kwargs.enable_thinking`) via `/thinking` command or `Ctrl+Shift+T` shortcut; persists state per session |
 | token-footer | `.pi/extensions/token-footer.ts` | Custom footer showing actual token counts (e.g. `2.9k/160k`) instead of percentage; toggle with `/token-footer` |
 | undo | `.pi/extensions/undo.ts` | `/undo` command — auto-picks the most recent user message on the current branch and rolls back without summarization |
+| bell | `.pi/extensions/bell.ts` | Plays a bell sound via PipeWire when the agent finishes its turn |
 
 ## Key Files
 
@@ -44,6 +45,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | `.pi/extensions/thinking-toggle.ts` | Thinking toggle extension source |
 | `.pi/extensions/token-footer.ts` | Token footer extension source |
 | `.pi/extensions/undo.ts` | Undo extension source |
+| `.pi/extensions/bell.ts` | Bell extension source (plays sound on `agent_end`) |
 | `.pi/auth.json` | Auth credentials (stores `NOT_NEEDED` for local-llama) |
 | `.pi/bin/fd` | Vendored `fd-find` binary |
 | `pi.sh` | Launcher (sets `PI_CODING_AGENT_DIR`) |
