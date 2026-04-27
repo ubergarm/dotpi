@@ -33,7 +33,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode (`chat_template_kwargs.enable_thinking`) via `/thinking` command or `Ctrl+Shift+T` shortcut; persists state per session |
 | token-footer | `.pi/extensions/token-footer.ts` | Custom footer showing actual token counts (e.g. `2.9k/160k`) instead of percentage; toggle with `/token-footer` |
 | undo | `.pi/extensions/undo.ts` | `/undo` command — auto-picks the most recent user message on the current branch and rolls back without summarization |
-| bell | `.pi/extensions/bell.ts` | Plays a bell sound via PipeWire when the agent finishes its turn |
+| bell | `.pi/extensions/bell.ts` | Plays 1–5 bell rings via PipeWire when the agent finishes, scaling with duration (<1m→1, 1–3m→2, 3–5m→3, 5–15m→4, ≥15m→5) |
 
 ## Key Files
 
@@ -45,7 +45,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | `.pi/extensions/thinking-toggle.ts` | Thinking toggle extension source |
 | `.pi/extensions/token-footer.ts` | Token footer extension source |
 | `.pi/extensions/undo.ts` | Undo extension source |
-| `.pi/extensions/bell.ts` | Bell extension source (plays sound on `agent_end`) |
+| `.pi/extensions/bell.ts` | Bell extension source (plays 1–5 rings on `agent_end` based on agent duration) |
 | `.pi/auth.json` | Auth credentials (stores `NOT_NEEDED` for local-llama) |
 | `.pi/bin/fd` | Vendored `fd-find` binary |
 | `pi.sh` | Launcher (sets `PI_CODING_AGENT_DIR`) |
