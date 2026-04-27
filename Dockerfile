@@ -40,6 +40,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bc \
     tldr \
     man-db \
+    libfmt-dev \
+    libgoogle-glog-dev \
+    libboost-dev \
+    pkg-config \
+    libcap-dev \
+    gawk \
+    texinfo \
+    flex \
+    bison \
+    libgmp3-dev \
+    libmpfr-dev \
+    zlib1g-dev \
+    libexpat1-dev \
+    libjson-c-dev \
+    libgtest-dev \
+    libgmock-dev \
+    lz4 \
+    liblz4-dev \
+    nlohmann-json3-dev \
+    libfftw3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Fetch latest LTS Node.js version dynamically at build time from index.json
