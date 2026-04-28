@@ -54,7 +54,7 @@ All pi configuration lives in the `.pi/` directory:
 
 ```json
 {
-  "lastChangelogVersion": "0.70.2",
+  "lastChangelogVersion": "0.70.5",
   "defaultProvider": "local-llama-8088",
   "defaultModel": "ubergarm/Kimi-K2.6-GGUF",
   "enableInstallTelemetry": false,
