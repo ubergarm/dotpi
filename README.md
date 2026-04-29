@@ -9,8 +9,7 @@ first-class support for [ik](https://github.com/ikawrakow/ik_llama.cpp)/[llama.c
 | Path | What |
 |------|------|
 | `.pi/settings.json` | Default provider, model, theme |
-| `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` / `localhost:8088`; auto-detects vision & reasoning; injects generation params |
-| `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode via `/thinking` or `Ctrl+Shift+T` |
+| `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` / `localhost:8088`; auto-detects vision & reasoning; maps pi thinking levels (Shift+Tab) to `thinking_budget_tokens`; thinking toggle via `/thinking` or `Ctrl+Shift+T`; dynamic footer status refresh; session-persistent thinking state |
 | `.pi/extensions/token-footer.ts` | Actual token counts in footer instead of percentage |
 | `.pi/extensions/undo.ts` | `/undo` — roll back to last user message |
 | `.pi/extensions/bell.ts` | Bell sound on agent turn end |
@@ -38,6 +37,20 @@ A Docker image is included but optional:
 ./docker-build-image.sh
 ./docker-run.sh
 ```
+
+## Message Queue
+
+While the agent is working you can still type — messages are queued instead of interrupting:
+
+| Key | Type | When delivered |
+|-----|------|----------------|
+| **Enter** | *Steering* | Before the agent's next LLM call (mid-work course correction) |
+| **Alt+Enter** | *Follow-up* | After the agent finishes all work (stack new tasks) |
+| **Alt+Up** | Dequeue | Pull queued messages back into the editor to edit |
+
+**Steering** (Enter) — course corrections and mid-work instructions. The agent picks these up before its next LLM call, so you can redirect it without waiting for it to finish.
+
+**Follow-up** (Alt+Enter) — new tasks queued for after the agent completes. These are held until the agent is fully idle with no pending tool calls or steering messages. Use this to stack up work while the agent is busy.
 
 ## Docs
 

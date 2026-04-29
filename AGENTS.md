@@ -21,7 +21,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | Command | Description |
 |---------|-------------|
 | `llama-params` | Show local-llama server defaults and current generation overrides |
-| `thinking` | Toggle thinking mode on/off for local-llama models (`/thinking on`/`off`) |
+| `Shift+Tab` | Cycle thinking level (`off`/`minimal`/`low`/`medium`/`high`/`xhigh`). The `local-llama` extension maps each level to `thinking_budget_tokens` via `defaults.json` `levelBudgets` |
 | `token-footer` | Toggle custom token footer (actual token counts vs percentage) |
 | `undo` | Roll back to the most recent user message, placing its text in the editor for re-submission |
 
@@ -29,8 +29,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 
 | Extension | Path | Notes |
 |-----------|------|-------|
-| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` and `localhost:8088`; auto-detects vision & reasoning support via `/props`; injects generation params; status bar shows endpoint health with 🧠/💤 reasoning indicator |
-| thinking-toggle | `.pi/extensions/thinking-toggle.ts` | Toggle thinking mode (`chat_template_kwargs.enable_thinking`) via `/thinking` command or `Ctrl+Shift+T` shortcut; persists state per session |
+| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` and `localhost:8088`; auto-detects vision & reasoning support via `/props`; injects generation params; maps pi thinking levels (Shift+Tab) to `thinking_budget_tokens` via `levelBudgets` in `defaults.json`; `/thinking` command and `Ctrl+Shift+T` shortcut to toggle thinking mode; footer status with dynamic refresh on `turn_start` (catches Shift+Tab level changes); session-persistent thinking state |
 | token-footer | `.pi/extensions/token-footer.ts` | Custom footer showing actual token counts (e.g. `2.9k/160k`) instead of percentage; toggle with `/token-footer` |
 | undo | `.pi/extensions/undo.ts` | `/undo` command — auto-picks the most recent user message on the current branch and rolls back without summarization |
 | bell | `.pi/extensions/bell.ts` | Plays 1–5 bell rings via PipeWire when the agent finishes, scaling with duration (<1m→1, 1–3m→2, 3–5m→3, 5–15m→4, ≥15m→5) |
@@ -40,9 +39,8 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | File | Purpose |
 |------|---------|
 | `.pi/settings.json` | Default provider, model, theme, thinking level |
-| `.pi/extensions/local-llama/defaults.json` | Token pricing and generation settings (temperature, topP, reasoning budget, etc.) |
-| `.pi/extensions/local-llama/index.ts` | local-llama extension source |
-| `.pi/extensions/thinking-toggle.ts` | Thinking toggle extension source |
+| `.pi/extensions/local-llama/defaults.json` | Token pricing, generation settings (temperature, topP, etc.), and thinking-level-to-budget mapping (`levelBudgets`) |
+| `.pi/extensions/local-llama/index.ts` | local-llama extension source (includes thinking toggle, commands, shortcuts, status) |
 | `.pi/extensions/token-footer.ts` | Token footer extension source |
 | `.pi/extensions/undo.ts` | Undo extension source |
 | `.pi/extensions/bell.ts` | Bell extension source (plays 1–5 rings on `agent_end` based on agent duration) |

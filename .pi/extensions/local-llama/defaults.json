@@ -6,11 +6,18 @@
     "cacheWrite": 3.75
   },
   "serverFlags": {
-    "reasoningBudget": 8192,
     "temperature": 0.7,
     "topP": 0.95,
     "topK": 40,
     "repeatPenalty": 1.0,
     "presencePenalty": 0.0
+  },
+  "levelBudgets": {
+    "off": 0,
+    "minimal": 1024,
+    "low": 2048,
+    "medium": 4096,
+    "high": 8192,
+    "xhigh": 16384
   }
 }

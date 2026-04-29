@@ -15,7 +15,6 @@ const DEFAULT_PRICING = {
 };
 
 interface GenerationSettings {
-  reasoningBudget: number;
   temperature: number;
   topP: number;
   topK: number;
@@ -24,7 +23,6 @@ interface GenerationSettings {
 }
 
 const DEFAULT_GENERATION_SETTINGS: GenerationSettings = {
-  reasoningBudget: 8192,
   temperature: 0.7,
   topP: 0.95,
   topK: 40,
@@ -32,12 +30,35 @@ const DEFAULT_GENERATION_SETTINGS: GenerationSettings = {
   presencePenalty: 0.0,
 };
 
+interface LevelBudgets {
+  off: number;
+  minimal: number;
+  low: number;
+  medium: number;
+  high: number;
+  xhigh: number;
+}
+
+const DEFAULT_LEVEL_BUDGETS: LevelBudgets = {
+  off: 0,
+  minimal: 1024,
+  low: 2048,
+  medium: 4096,
+  high: 8192,
+  xhigh: 16384,
+};
+
 interface DefaultsConfig {
   pricing?: typeof DEFAULT_PRICING;
   serverFlags?: Partial<GenerationSettings>;
+  levelBudgets?: Partial<LevelBudgets>;
 }
 
-function loadDefaults(): { pricing: typeof DEFAULT_PRICING; generationSettings: GenerationSettings } {
+function loadDefaults(): {
+  pricing: typeof DEFAULT_PRICING;
+  generationSettings: GenerationSettings;
+  levelBudgets: LevelBudgets;
+} {
   try {
     const defaultsPath = join(__dirname, "defaults.json");
     const raw = readFileSync(defaultsPath, "utf-8");
@@ -45,11 +66,13 @@ function loadDefaults(): { pricing: typeof DEFAULT_PRICING; generationSettings: 
     return {
       pricing: parsed.pricing ?? DEFAULT_PRICING,
       generationSettings: { ...DEFAULT_GENERATION_SETTINGS, ...parsed.serverFlags },
+      levelBudgets: { ...DEFAULT_LEVEL_BUDGETS, ...parsed.levelBudgets },
     };
   } catch {
     return {
       pricing: DEFAULT_PRICING,
       generationSettings: DEFAULT_GENERATION_SETTINGS,
+      levelBudgets: DEFAULT_LEVEL_BUDGETS,
     };
   }
 }
@@ -214,7 +237,11 @@ function isLocalLlama(ctx: { model?: { provider?: string } }): boolean {
  * Maps camelCase config keys to the snake_case field names llama-server
  * expects in the OpenAI-compat API body.
  */
-function buildBodyOverrides(settings: GenerationSettings): Record<string, number> {
+function buildBodyOverrides(
+  settings: GenerationSettings,
+  level: string,
+  levelBudgets: LevelBudgets,
+): Record<string, number> {
   const overrides: Record<string, number> = {};
 
   // Only send temperature if it differs from the OpenAI default (1.0)
@@ -227,7 +254,11 @@ function buildBodyOverrides(settings: GenerationSettings): Record<string, number
   overrides.top_k = settings.topK;
   overrides.repeat_penalty = settings.repeatPenalty;
   overrides.presence_penalty = settings.presencePenalty;
-  overrides.thinking_budget_tokens = settings.reasoningBudget;
+
+  const budget = levelBudgets[level as keyof LevelBudgets];
+  if (budget !== undefined) {
+    overrides.thinking_budget_tokens = budget;
+  }
 
   return overrides;
 }
@@ -235,7 +266,8 @@ function buildBodyOverrides(settings: GenerationSettings): Record<string, number
 // ── Extension factory ────────────────────────────────────────────────────────
 
 export default async function (pi: ExtensionAPI) {
-  const { pricing: defaultPricing, generationSettings } = loadDefaults();
+  const { pricing: defaultPricing, generationSettings, levelBudgets } = loadDefaults();
+  let thinkingEnabled = true;
 
   // Fetch props and models from all endpoints in parallel
   const results = await Promise.all(
@@ -276,25 +308,45 @@ export default async function (pi: ExtensionAPI) {
     });
   }
 
+  // ── turn_start: refresh status before each turn ───────────────────────
+  // Catches Shift+Tab thinking-level changes that happened while idle,
+  // refreshing the footer just before the next LLM call.
+
+  pi.on("turn_start", (_event, ctx) => {
+    if (isLocalLlama(ctx)) {
+      updateStatus(ctx);
+    }
+  });
+
   // ── before_provider_request: inject generation params ──────────────────
 
   pi.on("before_provider_request", (event, ctx) => {
     if (!isLocalLlama(ctx)) return;
 
     const payload = event.payload as Record<string, unknown>;
-    const overrides = buildBodyOverrides(generationSettings);
+    const thinkingLevel = pi.getThinkingLevel();
+    const overrides = buildBodyOverrides(generationSettings, thinkingLevel, levelBudgets);
+
+    const chatTemplateKwargs = (payload.chat_template_kwargs as Record<string, unknown> | undefined) ?? {};
 
     return {
       ...payload,
       ...overrides,
+      chat_template_kwargs: {
+        ...chatTemplateKwargs,
+        enable_thinking: thinkingEnabled,
+        clear_thinking: false,
+        preserve_thinking: true,
+      },
     };
   });
 
   // ── Status display ─────────────────────────────────────────────────────
 
-  function updateStatus(ctx: { ui: { setStatus: (id: string, text?: string) => void } }) {
+  function updateStatus(ctx: { ui: { setStatus: (id: string, text?: string) => void; theme: { fg: (color: string, text: string) => string } } }) {
     if (aliveEndpoints.size === 0) {
       ctx.ui.setStatus("local-llama", undefined);
+      ctx.ui.setStatus("thinking", undefined);
       return;
     }
 
@@ -307,10 +359,72 @@ export default async function (pi: ExtensionAPI) {
       parts.push(`local:${port} ${labels}.`);
     }
     ctx.ui.setStatus("local-llama", parts.join(" "));
+
+    // Thinking status
+    if (thinkingEnabled) {
+      const thinkingLevel = pi.getThinkingLevel();
+      const budget = levelBudgets[thinkingLevel as keyof LevelBudgets] ?? 0;
+      ctx.ui.setStatus(
+        "thinking",
+        ctx.ui.theme.fg("accent", `thinking ✅ effort: ${thinkingLevel} (${budget})`)
+      );
+    } else {
+      ctx.ui.setStatus("thinking", ctx.ui.theme.fg("dim", "no-think 🚫"));
+    }
   }
 
   pi.on("session_start", async (_event, ctx) => {
+    // Restore thinking state from session
+    const entries = ctx.sessionManager.getEntries();
+    const stateEntry = entries
+      .filter((e) => e.type === "custom" && e.customType === "thinking-toggle")
+      .pop() as { data?: { enabled?: boolean } } | undefined;
+
+    if (stateEntry?.data && typeof stateEntry.data.enabled === "boolean") {
+      thinkingEnabled = stateEntry.data.enabled;
+    }
+
     updateStatus(ctx);
+  });
+
+  // ── Command: toggle thinking ──────────────────────────────────────────
+
+  pi.registerCommand("thinking", {
+    description: "Toggle thinking mode for local-llama models",
+    handler: async (args, ctx) => {
+      const arg = args?.trim().toLowerCase();
+      if (arg === "on") {
+        thinkingEnabled = true;
+      } else if (arg === "off") {
+        thinkingEnabled = false;
+      } else {
+        thinkingEnabled = !thinkingEnabled;
+      }
+
+      updateStatus(ctx);
+      ctx.ui.notify(
+        `Thinking ${thinkingEnabled ? "enabled" : "disabled"}`,
+        "info"
+      );
+
+      // Persist state
+      pi.appendEntry("thinking-toggle", { enabled: thinkingEnabled });
+    },
+  });
+
+  // ── Shortcut: toggle thinking ───────────────────────────────────────────
+
+  pi.registerShortcut("ctrl+shift+t", {
+    description: "Toggle thinking mode",
+    handler: async (ctx) => {
+      thinkingEnabled = !thinkingEnabled;
+      updateStatus(ctx);
+      ctx.ui.notify(
+        `Thinking ${thinkingEnabled ? "enabled" : "disabled"}`,
+        "info"
+      );
+      pi.appendEntry("thinking-toggle", { enabled: thinkingEnabled });
+    },
   });
 
   // ── Command: show server defaults ──────────────────────────────────────
@@ -345,10 +459,14 @@ export default async function (pi: ExtensionAPI) {
         lines.push("");
       }
 
-      lines.push("Current request overrides (from defaults.json):");
-      const overrides = buildBodyOverrides(generationSettings);
-      for (const [key, value] of Object.entries(overrides)) {
-        lines.push(`  ${key}: ${value}`);
+      const thinkingLevel = pi.getThinkingLevel();
+      const budget = levelBudgets[thinkingLevel as keyof LevelBudgets] ?? 0;
+      lines.push(`Current thinking level: ${thinkingLevel} (${budget} tokens)`);
+      lines.push("");
+      lines.push("Level-to-budget mapping (from defaults.json):");
+      for (const [level, value] of Object.entries(levelBudgets)) {
+        const marker = level === thinkingLevel ? " ← current" : "";
+        lines.push(`  ${level}: ${value}${marker}`);
       }
       lines.push("");
       lines.push("Edit .pi/extensions/local-llama/defaults.json to change values.");
