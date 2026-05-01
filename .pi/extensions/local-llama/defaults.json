@@ -1,4 +1,8 @@
 {
+  "endpoints": [
+    { "name": "local-llama-8080", "baseUrl": "http://localhost:8080/v1" },
+    { "name": "local-llama-8088", "baseUrl": "http://localhost:8088/v1" }
+  ],
   "pricing": {
     "input": 3,
     "output": 15,

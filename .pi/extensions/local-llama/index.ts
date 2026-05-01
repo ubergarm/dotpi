@@ -48,13 +48,25 @@ const DEFAULT_LEVEL_BUDGETS: LevelBudgets = {
   xhigh: 16384,
 };
 
+interface Endpoint {
+  name: string;
+  baseUrl: string;
+}
+
+const DEFAULT_ENDPOINTS: Endpoint[] = [
+  { name: "local-llama-8080", baseUrl: "http://localhost:8080/v1" },
+  { name: "local-llama-8088", baseUrl: "http://localhost:8088/v1" },
+];
+
 interface DefaultsConfig {
+  endpoints?: Endpoint[];
   pricing?: typeof DEFAULT_PRICING;
   serverFlags?: Partial<GenerationSettings>;
   levelBudgets?: Partial<LevelBudgets>;
 }
 
 function loadDefaults(): {
+  endpoints: Endpoint[];
   pricing: typeof DEFAULT_PRICING;
   generationSettings: GenerationSettings;
   levelBudgets: LevelBudgets;
@@ -64,12 +76,14 @@ function loadDefaults(): {
     const raw = readFileSync(defaultsPath, "utf-8");
     const parsed = JSON.parse(raw) as DefaultsConfig;
     return {
+      endpoints: parsed.endpoints ?? DEFAULT_ENDPOINTS,
       pricing: parsed.pricing ?? DEFAULT_PRICING,
       generationSettings: { ...DEFAULT_GENERATION_SETTINGS, ...parsed.serverFlags },
       levelBudgets: { ...DEFAULT_LEVEL_BUDGETS, ...parsed.levelBudgets },
     };
   } catch {
     return {
+      endpoints: DEFAULT_ENDPOINTS,
       pricing: DEFAULT_PRICING,
       generationSettings: DEFAULT_GENERATION_SETTINGS,
       levelBudgets: DEFAULT_LEVEL_BUDGETS,
@@ -77,12 +91,7 @@ function loadDefaults(): {
   }
 }
 
-// ── Endpoints ────────────────────────────────────────────────────────────────
 
-const ENDPOINTS = [
-  { name: "local-llama-8080", baseUrl: "http://localhost:8080/v1" },
-  { name: "local-llama-8088", baseUrl: "http://localhost:8088/v1" },
-];
 
 // ── Props fetching ──────────────────────────────────────────────────────────
 
@@ -266,12 +275,12 @@ function buildBodyOverrides(
 // ── Extension factory ────────────────────────────────────────────────────────
 
 export default async function (pi: ExtensionAPI) {
-  const { pricing: defaultPricing, generationSettings, levelBudgets } = loadDefaults();
+  const { endpoints, pricing: defaultPricing, generationSettings, levelBudgets } = loadDefaults();
   let thinkingEnabled = true;
 
   // Fetch props and models from all endpoints in parallel
   const results = await Promise.all(
-    ENDPOINTS.map(async ({ name, baseUrl }) => {
+    endpoints.map(async ({ name, baseUrl }) => {
       const props = await fetchProps(baseUrl);
       const visionSupported = supportsVision(props);
       const reasoningSupported = supportsReasoning(props);
