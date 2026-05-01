@@ -308,9 +308,17 @@ export default async function (pi: ExtensionAPI) {
     });
   }
 
-  // ── turn_start: refresh status before each turn ───────────────────────
-  // Catches Shift+Tab thinking-level changes that happened while idle,
-  // refreshing the footer just before the next LLM call.
+  // ── thinking_level_select: refresh status on level change ────
+  // Catches Shift+Tab / model-change level switches immediately,
+  // without waiting for the next turn.
+
+  pi.on("thinking_level_select", async (_event, ctx) => {
+    updateStatus(ctx);
+  });
+
+  // ── turn_start: refresh status before each turn ───────────────
+  // Safety net — ensures status is correct before each turn even
+  // if something changed between events.
 
   pi.on("turn_start", (_event, ctx) => {
     if (isLocalLlama(ctx)) {

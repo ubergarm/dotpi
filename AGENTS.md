@@ -29,7 +29,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 
 | Extension | Path | Notes |
 |-----------|------|-------|
-| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` and `localhost:8088`; auto-detects vision & reasoning support via `/props`; injects generation params; maps pi thinking levels (Shift+Tab) to `thinking_budget_tokens` via `levelBudgets` in `defaults.json`; `/thinking` command and `Ctrl+Shift+T` shortcut to toggle thinking mode; footer status with dynamic refresh on `turn_start` (catches Shift+Tab level changes); session-persistent thinking state |
+| local-llama | `.pi/extensions/local-llama/` | Dynamic model discovery from `localhost:8080` and `localhost:8088`; auto-detects vision & reasoning support via `/props`; injects generation params; maps pi thinking levels (Shift+Tab) to `thinking_budget_tokens` via `levelBudgets` in `defaults.json`; `/thinking` command and `Ctrl+Shift+T` shortcut to toggle thinking mode; footer status with live refresh on `thinking_level_select` (Shift+Tab) and `turn_start`; session-persistent thinking state |
 | token-footer | `.pi/extensions/token-footer.ts` | Custom footer showing actual token counts (e.g. `2.9k/160k`) instead of percentage; toggle with `/token-footer` |
 | undo | `.pi/extensions/undo.ts` | `/undo` command — auto-picks the most recent user message on the current branch and rolls back without summarization |
 | bell | `.pi/extensions/bell.ts` | Plays 1–5 bell rings via PipeWire when the agent finishes, scaling with duration (<1m→1, 1–3m→2, 3–5m→3, 5–15m→4, ≥15m→5) |
