@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     zip \
     bzip2 \
+    poppler-utils \
     sqlite3 \
     bc \
     tldr \
