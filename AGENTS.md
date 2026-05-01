@@ -38,15 +38,9 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 
 | File | Purpose |
 |------|---------|
-| `.pi/settings.json` | Default provider, model, theme, thinking level |
 | `.pi/extensions/local-llama/defaults.json` | Token pricing, generation settings (temperature, topP, etc.), and thinking-level-to-budget mapping (`levelBudgets`) |
-| `.pi/extensions/local-llama/index.ts` | local-llama extension source (includes thinking toggle, commands, shortcuts, status) |
-| `.pi/extensions/token-footer.ts` | Token footer extension source |
-| `.pi/extensions/undo.ts` | Undo extension source |
-| `.pi/extensions/bell.ts` | Bell extension source (plays 1–5 rings on `agent_end` based on agent duration) |
 | `.pi/auth.json` | Auth credentials (stores `NOT_NEEDED` for local-llama) |
 | `.pi/bin/fd` | Vendored `fd-find` binary |
-| `pi.sh` | Launcher (sets `PI_CODING_AGENT_DIR`) |
 | `Dockerfile` | Dev container (Debian bookworm, Node.js LTS, ripgrep, fd-find, git, build-essential, cmake) |
 | `docker-build-image.sh` | Build the Docker image (`pi:latest`) |
 | `docker-run.sh` | Run container (mounts workspace + host `uv` binary/cache) |
@@ -61,16 +55,3 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 ### Agent Environment
 
 The container runs as user `job` with passwordless `sudo`. You can run `sudo apt-get update` to search for or install additional packages. A broad set of CLI utilities is pre-installed (networking, binary inspection, process tracing, archives, etc.). If you need to learn how a pre-installed tool works, use `tldr <command>` for a quick summary, `man <command>` for full documentation, or `dpkg -l | grep <pattern>` to discover available packages.
-
-## Documentation
-
-Full upstream docs: `/app/pi/node_modules/@mariozechner/pi-coding-agent/docs/`
-
-Key topics:
-- `extensions.md` — Building custom extensions
-- `skills.md` — Creating skill packages
-- `themes.md` — Custom themes
-- `keybindings.md` — Keyboard shortcuts
-- `settings.md` — All configuration options
-- `providers.md` — Provider setup
-- `models.md` — Model configuration
