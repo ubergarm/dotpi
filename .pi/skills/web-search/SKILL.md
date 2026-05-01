@@ -12,19 +12,17 @@ description: >
 
 Web search and content extraction powered by [ddgs](https://github.com/mesonix/ddgs).
 
-## Setup
+## Web Search
 
-Run once before first use (from `/app/pi`):
+All commands below run from `.pi/skills/web-search` using `uv run`. The venv should already exist.
+If a command fails because it's missing, create it once:
 
 ```bash
-cd .pi/skills/web-search
 uv venv .venv --relocatable --python 3.13 --python-preference=only-managed
 uv sync
 ```
 
-## Web Search
-
-Search the web for information. Supports text, news, images, videos, and books.
+---
 
 ### Basic search
 
@@ -44,8 +42,6 @@ uv run python web_search.py --query "mountain landscapes" --type images --limit 
 # Video search
 uv run python web_search.py --query "python tutorial" --type videos
 
-# Output as markdown instead of JSON
-uv run python web_search.py --query "rust programming" --format markdown
 ```
 
 ### Search and extract top result
@@ -66,12 +62,45 @@ uv run python web_search.py --query "Python documentation" --extract-top
 
 ## Extract Page Content
 
-Fetch and extract readable content from a URL:
+Fetch and extract readable content from a URL. Always save to a temp file if the content is too large to read in one go.
 
 ```bash
-uv run python web_search.py --extract https://example.com
-uv run python web_search.py --extract https://en.wikipedia.org/wiki/Python --format markdown
+uv run python web_search.py --extract https://example.com --extract-fmt text_markdown > /tmp/page.md 2>&1
 ```
+
+### Extraction formats
+
+The `--extract-fmt` flag controls how the page content is processed:
+
+```bash
+# Default: markdown
+uv run python web_search.py --extract https://example.com --extract-fmt text_markdown
+
+# Plain text
+uv run python web_search.py --extract https://example.com --extract-fmt text_plain
+
+# Rich text (preserves more formatting)
+uv run python web_search.py --extract https://example.com --extract-fmt text_rich
+
+# Raw HTML
+uv run python web_search.py --extract https://example.com --extract-fmt text
+
+# Raw bytes (no wrapper, writes directly to stdout or file)
+uv run python web_search.py --extract https://example.com --extract-fmt content -o page.bin
+```
+
+| Format          | Description                           |
+| --------------- | ------------------------------------- |
+| `text_markdown` | Markdown (default)                    |
+| `text_plain`    | Plain text                            |
+| `text_rich`     | Rich text with preserved formatting   |
+| `text`          | Raw HTML/JSON                         |
+| `content`       | Raw bytes (no wrapper)                |
+
+> **Note:** The underlying `primp` HTTP client uses `impersonate="random"` to rotate browser
+> fingerprints. Some sites (e.g. Reddit) actively block certain fingerprints, so `--extract`
+> may return HTTP 403 intermittently. If this happens, simply retry — a different random
+> fingerprint will succeed on subsequent attempts.
 
 ## Options Reference
 
@@ -81,10 +110,11 @@ uv run python web_search.py --extract https://en.wikipedia.org/wiki/Python --for
 | `--extract`    | URL to extract content from                      | -          |
 | `--type`       | Search type: text, news, images, videos, books   | text       |
 | `--limit`      | Maximum number of results                        | 10         |
-| `--format`     | Output format: json, markdown                    | json       |
+
 | `--backend`    | Search backend: auto, duckduckgo, bing, brave    | auto       |
 | `--region`     | Region code (us-en, uk-en, etc.)                 | us-en      |
 | `--safesearch` | SafeSearch: on, moderate, off                    | moderate   |
 | `--timelimit`  | Time filter: d (day), w (week), m (month), y    | -          |
 | `--extract-top`| Extract content from the top search result        | -          |
+| `--extract-fmt`| Extraction format (see table above)               | text_markdown |
 | `-o`, `--output`| Save output to file                              | -          |

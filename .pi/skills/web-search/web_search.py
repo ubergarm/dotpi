@@ -80,98 +80,6 @@ SEARCH_FUNCTIONS = {
 }
 
 
-def format_result_markdown(result, search_type):
-    """Format a single search result as markdown."""
-    lines = []
-
-    title = result.get("title", "Untitled")
-    if search_type == "text":
-        href = result.get("href", "")
-        body = result.get("body", "")
-        lines.append(f"### [{title}]({href})")
-        if body:
-            lines.append(f"\n{body}")
-    elif search_type == "news":
-        url = result.get("url", "")
-        body = result.get("body", "")
-        date = result.get("date", "")
-        source = result.get("source", "")
-        lines.append(f"### [{title}]({url})")
-        if source:
-            lines.append(f"\n**Source:** {source}")
-        if date:
-            lines.append(f" | **Date:** {date}")
-        if body:
-            lines.append(f"\n\n{body}")
-    elif search_type == "images":
-        url = result.get("url", "")
-        image = result.get("image", "")
-        source = result.get("source", "")
-        lines.append(f"### {title}")
-        lines.append(f"\n- **Page:** {url}")
-        lines.append(f"- **Image:** {image}")
-        if source:
-            lines.append(f"- **Source:** {source}")
-        height = result.get("height")
-        width = result.get("width")
-        if height and width:
-            lines.append(f"- **Size:** {width}x{height}")
-    elif search_type == "videos":
-        content = result.get("content", "")
-        description = result.get("description", "")
-        duration = result.get("duration", "")
-        publisher = result.get("publisher", "")
-        lines.append(f"### [{title}]({content})")
-        meta = []
-        if publisher:
-            meta.append(f"**Publisher:** {publisher}")
-        if duration:
-            meta.append(f"**Duration:** {duration}")
-        if meta:
-            lines.append("\n" + " | ".join(meta))
-        if description:
-            lines.append(f"\n{description}")
-    elif search_type == "books":
-        url = result.get("url", "")
-        author = result.get("author", "")
-        publisher_info = result.get("publisher", "")
-        info = result.get("info", "")
-        lines.append(f"### [{title}]({url})")
-        if author:
-            lines.append(f"\n**Author:** {author}")
-        if publisher_info:
-            lines.append(f" | **Publisher:** {publisher_info}")
-        if info:
-            lines.append(f"\n\n{info}")
-
-    return "\n".join(lines)
-
-
-def format_results_markdown(results, query, search_type):
-    """Format all search results as markdown."""
-    lines = [f"# Search Results: {query}\n"]
-    lines.append(f"**Type:** {search_type} | **Results:** {len(results)}\n")
-    lines.append("---\n")
-
-    for i, result in enumerate(results, 1):
-        lines.append(f"{format_result_markdown(result, search_type)}\n")
-        if i < len(results):
-            lines.append("---\n")
-
-    return "\n".join(lines)
-
-
-def format_extract_markdown(extract_result):
-    """Format extraction result as markdown."""
-    url = extract_result.get("url", "")
-    content = extract_result.get("content", "")
-    lines = [f"# Extracted Content\n"]
-    lines.append(f"**Source:** {url}\n")
-    lines.append("---\n")
-    lines.append(str(content))
-    return "\n".join(lines)
-
-
 def run_search(args):
     """Execute a search query."""
     ddgs = DDGS()
@@ -212,18 +120,16 @@ def run_search(args):
         print(f"Extracting content from top result: {top_url}", file=sys.stderr)
         return run_extract_url(ddgs, top_url, args)
 
-    if args.format == "markdown":
-        output = format_results_markdown(results, args.query, search_type)
-    else:
-        output = json.dumps(results, indent=2, ensure_ascii=False)
+    output = json.dumps(results, indent=2, ensure_ascii=False)
 
     return output
 
 
 def run_extract_url(ddgs, url, args):
     """Extract content from a single URL."""
+    extract_fmt = getattr(args, "extract_fmt", None) or "text_markdown"
     try:
-        result = ddgs.extract(url=url, fmt="text_markdown")
+        result = ddgs.extract(url=url, fmt=extract_fmt)
     except Exception as e:
         print(f"Error: Extraction failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -232,12 +138,7 @@ def run_extract_url(ddgs, url, args):
         print("Error: No content extracted.", file=sys.stderr)
         sys.exit(1)
 
-    if args.format == "markdown":
-        output = format_extract_markdown(result)
-    else:
-        output = json.dumps(result, indent=2, ensure_ascii=False)
-
-    return output
+    return result.get("content", "")
 
 
 def run_extract(args):
@@ -274,12 +175,6 @@ def main():
         help="Maximum number of results (default: 10)",
     )
     parser.add_argument(
-        "--format",
-        choices=["json", "markdown"],
-        default="json",
-        help="Output format (default: json)",
-    )
-    parser.add_argument(
         "--backend",
         default="auto",
         help="Search backend: auto, duckduckgo, bing, brave, google, mojeek, yandex, yahoo, wikipedia (default: auto)",
@@ -307,6 +202,14 @@ def main():
         help="Extract content from the top search result URL",
     )
     parser.add_argument(
+        "--extract-fmt",
+        choices=["text_markdown", "text_plain", "text_rich", "text", "content"],
+        default=None,
+        help="Extraction format (default: text_markdown). "
+             "text_markdown=markdown, text_plain=plain text, text_rich=rich text, "
+             "text=raw HTML, content=raw bytes",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         type=Path,
@@ -324,12 +227,20 @@ def main():
     else:
         output = run_search(args)
 
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(output, encoding="utf-8")
-        print(f"Saved to: {args.output}", file=sys.stderr)
+    if isinstance(output, bytes):
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_bytes(output)
+            print(f"Saved to: {args.output}", file=sys.stderr)
+        else:
+            sys.stdout.buffer.write(output)
     else:
-        print(output)
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(output, encoding="utf-8")
+            print(f"Saved to: {args.output}", file=sys.stderr)
+        else:
+            print(output)
 
 
 if __name__ == "__main__":
