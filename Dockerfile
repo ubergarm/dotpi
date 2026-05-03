@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     zip \
     bzip2 \
+    poppler-utils \
     sqlite3 \
     bc \
     tldr \
@@ -61,6 +62,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     liblz4-dev \
     nlohmann-json3-dev \
     libfftw3-dev \
+    ffmpeg \
+    sox \
+    libsox-fmt-mp3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Fetch latest LTS Node.js version dynamically at build time from index.json
