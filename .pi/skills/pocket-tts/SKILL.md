@@ -98,19 +98,20 @@ pw-play dialogue.wav
 
 ## Generate from stdin
 
-Pass text via stdin when the content is in a file or variable:
+Pass text via stdin with `--text -` when the content is in a file or variable. **Omitting `--text -` causes the CLI to fall back to a default "Hello world" prompt instead of reading stdin.**
 
 ```bash
-echo "This is a long passage of text." | pocket-tts generate --voice fantine
+echo "This is a long passage of text." | pocket-tts generate --text - --voice fantine
 ```
 
 ## Options summary
 
 | Option | Description |
 |--------|-------------|
-| `--text TEXT` | Text to synthesize (or read from stdin) |
+| `--text TEXT` | Text to synthesize. Use `--text -` to read from stdin. |
 | `--voice TEXT` | Voice name (`fantine` default, `stuart_bell` for second voice) |
 | `--output-path TEXT` | Output WAV path (default `./tts_output.wav`; use `-` for stdout) |
+| `--max-tokens INT` | Max tokens per chunk (default `50`). The model auto-chunks, don't exceed ~128 or artifacts occur. |
 | `--language TEXT` | Model language (default `english`) |
 | `--temperature FLOAT` | Generation temperature (default `0.7`) |
 | `--quiet` / `-q` | Suppress logging output |
