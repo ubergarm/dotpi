@@ -62,10 +62,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     liblz4-dev \
     nlohmann-json3-dev \
     libfftw3-dev \
-    ffmpeg \
     sox \
     libsox-fmt-mp3 \
     && rm -rf /var/lib/apt/lists/*
+
+# Install latest static ffmpeg build (johnvansickle.com)
+RUN curl -fsSL -o /tmp/ffmpeg-static.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
+    && tar xf /tmp/ffmpeg-static.tar.xz --strip-components=1 -C /usr/local/bin --wildcards 'ffmpeg-*-amd64-static/ffmpeg' 'ffmpeg-*-amd64-static/ffprobe' \
+    && tar xf /tmp/ffmpeg-static.tar.xz --strip-components=1 -C /usr/local/share --wildcards 'ffmpeg-*-amd64-static/model' \
+    && chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe \
+    && chmod -R +r /usr/local/share/model \
+    && rm -f /tmp/ffmpeg-static.tar.xz
 
 # Fetch latest LTS Node.js version dynamically at build time from index.json
 RUN NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | jq -r '[.[] | select(.lts != null)] | sort_by(.date) | reverse | .[0].version | ltrimstr("v")') && \

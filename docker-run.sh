@@ -12,6 +12,7 @@ docker run --rm -it \
     -v "$LOCAL_UV:/usr/bin/uv:ro" \
     -v "$LOCAL_UV_PYTHON:/home/job/.local/share/uv/python/:ro" \
     -v "$LOCAL_UV_CACHE:/home/job/.cache/uv/" \
+    -v "$HOME/.cache/huggingface:/home/job/.cache/huggingface" \
     -v "$LOCAL_UV_PYTHON:/home/garm/.local/share/uv/python/:ro" \
     -e "TERM" \
     -e "COLORTERM" \
