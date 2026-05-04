@@ -15,6 +15,7 @@ Local LLM coding harness. See [README.md](README.md) for full setup, configurati
 | Skill | Path | Notes |
 |-------|------|-------|
 | web-search | `.pi/skills/web-search/` | DuckDuckGo search & page extraction via `ddgs`. Read `SKILL.md` for usage details. Uses `uv` + Python 3.13 |
+| whisper | `.pi/skills/whisper/` | Audio/video transcription via `faster-whisper` (large-v3 pre-cached). SRT/VTT/JSON/ASS output, word-level timestamps, GPU acceleration. Uses `uv` + Python 3.13 |
 
 ## Commands
 

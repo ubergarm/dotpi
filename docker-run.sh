@@ -6,6 +6,7 @@ LOCAL_UV_CACHE="$(uv cache dir)"
 LOCAL_UV_PYTHON="$(uv python dir)"
 
 docker run --rm -it \
+    --gpus all \
     --user "$(id -u):$(id -g)" \
     --network=host \
     -v "$(pwd):/app/:rw" \
