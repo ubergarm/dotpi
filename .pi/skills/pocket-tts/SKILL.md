@@ -2,7 +2,7 @@
 name: pocket-tts
 description: >
   Generate speech locally using the pocket-tts CLI. Defaults to the `fantine` voice;
-  use `stuart_bell` when a second voice is needed.
+  use `george` when a second voice is needed.
 ---
 
 # Pocket TTS
@@ -27,7 +27,7 @@ Or use the venv binary directly:
 ## Voice defaults
 
 - **Primary voice:** `fantine` (use this unless a different voice is explicitly requested)
-- **Second voice:** `stuart_bell` (use when two distinct voices are needed, e.g. dialogue)
+- **Second voice:** `george` (use when two distinct voices are needed, e.g. dialogue)
 
 ## Basic usage
 
@@ -91,7 +91,7 @@ Generate separate clips for each voice and concatenate:
 
 ```bash
 pocket-tts generate --text "Hello there!" --voice fantine --output-path line1.wav
-pocket-tts generate --text "Hi, how are you?" --voice stuart_bell --output-path line2.wav
+pocket-tts generate --text "Hi, how are you?" --voice george --output-path line2.wav
 ffmpeg -i line1.wav -i line2.wav -filter_complex "concat=n=2:v=0:a=1" dialogue.wav
 pw-play dialogue.wav
 ```
@@ -111,7 +111,7 @@ echo "This is a long passage of text." | pocket-tts generate --text - --voice fa
 | Option | Description |
 |--------|-------------|
 | `--text TEXT` | Text to synthesize. Use `--text -` to read from stdin. |
-| `--voice TEXT` | Voice name (`fantine` default, `stuart_bell` for second voice) |
+| `--voice TEXT` | Voice name (`fantine` default, `george` for second voice) |
 | `--output-path TEXT` | Output WAV path (default `./tts_output.wav`; use `-` for stdout) |
 | `--max-tokens INT` | Max tokens per chunk (default `50`). The model auto-chunks, don't exceed ~128 or artifacts occur. |
 | `--language TEXT` | Model language (default `english`) |
