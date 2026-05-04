@@ -96,6 +96,8 @@ ffmpeg -i line1.wav -i line2.wav -filter_complex "concat=n=2:v=0:a=1" dialogue.w
 pw-play dialogue.wav
 ```
 
+> **Tip:** Different voices can have different output levels. When assembling multi-clip projects, run `loudnorm=I=-16:LRA=11:TP=-1.5` on each clip individually before concatenating to keep all speakers at a consistent volume.
+
 ## Generate from stdin
 
 Pass text via stdin with `--text -` when the content is in a file or variable. **Omitting `--text -` causes the CLI to fall back to a default "Hello world" prompt instead of reading stdin.**
