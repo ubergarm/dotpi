@@ -10,7 +10,7 @@
  *   ≥ 15 min → 5 rings (max)
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const BELL_WAV = "/app/pi/assets/bell.wav";
 const RING_DELAY_MS = 500;

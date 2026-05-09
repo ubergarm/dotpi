@@ -8,9 +8,9 @@
  * Enabled by default. Use /token-footer to toggle on/off.
  */
 
-import type { AssistantMessage } from "@mariozechner/pi-ai";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import type { AssistantMessage } from "@earendil-works/pi-ai";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 
 export default function (pi: ExtensionAPI) {
   let enabled = true;
@@ -24,7 +24,7 @@ export default function (pi: ExtensionAPI) {
     return `${Math.round(count / 1_000_000)}M`;
   };
 
-  const setCustomFooter = (ctx: import("@mariozechner/pi-coding-agent").ExtensionContext) => {
+  const setCustomFooter = (ctx: import("@earendil-works/pi-coding-agent").ExtensionContext) => {
     ctx.ui.setFooter((tui, theme, footerData) => {
       const unsub = footerData.onBranchChange(() => tui.requestRender());
 

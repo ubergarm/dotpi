@@ -54,5 +54,5 @@ While the agent is working you can still type — messages are queued instead of
 
 ## Docs
 
-Upstream docs: `node_modules/@mariozechner/pi-coding-agent/docs/`
+Upstream docs: `node_modules/@earendil-works/pi-coding-agent/docs/`
 Agent dispatch file: [`AGENTS.md`](AGENTS.md)

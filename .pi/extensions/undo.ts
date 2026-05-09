@@ -11,7 +11,7 @@
  *   /undo    - Roll back to the most recent user message
  */
 
-import type { ExtensionAPI, SessionEntry } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, SessionEntry } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   /**
