@@ -4,6 +4,9 @@ A [pi.dev](https://pi.dev) config directory with example extensions providing
 first-class support for [ik](https://github.com/ikawrakow/ik_llama.cpp)/[llama.cpp](https://github.com/ggml-org/llama.cpp)
 `llama-server` local inference.
 
+> **Note:** This is mostly a personal custom setup, but the `local-llama` extension
+> may be useful for others until pi.dev adds first-class support for local LLMs.
+
 ## What's Here
 
 | Path | What |
@@ -14,6 +17,9 @@ first-class support for [ik](https://github.com/ikawrakow/ik_llama.cpp)/[llama.c
 | `.pi/extensions/undo.ts` | `/undo` — roll back to last user message |
 | `.pi/extensions/bell.ts` | Bell sound on agent turn end |
 | `.pi/skills/web-search/` | DuckDuckGo search & page extraction |
+| `.pi/skills/pdf-extract/` | Extract clean text and structured Markdown from PDFs via PyMuPDF4LLM |
+| `.pi/skills/pocket-tts/` | Local text-to-speech via pocket-tts CLI |
+| `.pi/skills/whisper/` | Audio/video transcription via faster-whisper (SRT/VTT/JSON output) |
 
 ## Quick Start
 
